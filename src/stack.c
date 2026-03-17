@@ -29,7 +29,7 @@ char pushStaticStack(staticStack* stack, char elm){
 char popStaticStack(staticStack* stack){
     if (stack->last == 0){
         printf("Stack empty!\n");
-        return -1;
+        return ' ';
     }
 
     stack->last--;

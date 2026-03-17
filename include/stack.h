@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef STACK_H
+#define STACK_H
 
 typedef struct staticStack {
     int* array;
@@ -30,3 +30,5 @@ char popDynamicStack(struct dynamicStack **head);
 void printDynamicStack(struct dynamicStack *head);
 
 void freeDynamicStack(struct dynamicStack **head);
+
+#endif
