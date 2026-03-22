@@ -11,7 +11,7 @@ typedef struct staticDeque {
 staticDeque* createStaticDeque(int size){
     staticDeque* deque = (staticDeque*)malloc(sizeof(staticDeque));
     deque->size = size + 1;
-    deque->array = (char*)malloc(size * sizeof(char));
+    deque->array = (char*)malloc(deque->size * sizeof(char));
     deque->head = 0;
     deque->tail = 0;
     return deque;
@@ -54,7 +54,7 @@ char popTailStaticDeque(staticDeque* deque){
         return ' ';
     }
 
-    deque->head = (deque->tail + 1) % deque->size;
+    deque->tail = (deque->tail + 1) % deque->size;
     char smbl = deque->array[deque->tail];
     return smbl;
 }
