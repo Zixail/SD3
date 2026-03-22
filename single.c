@@ -2,9 +2,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct staticStack {
-    char* array;
+    int* array;
     int size;
     int last;
 } staticStack;
@@ -12,12 +13,12 @@ typedef struct staticStack {
 staticStack* createStaticStack(int size){
     staticStack* stack = (staticStack*)malloc(sizeof(staticStack));
     stack->size = size;
-    stack->array = (char*)malloc(size * sizeof(char));
+    stack->array = (int*)malloc(size * sizeof(int));
     stack->last = 0;
     return stack;
 }
 
-char pushStaticStack(staticStack* stack, char elm){
+int pushStaticStack(staticStack* stack, int elm){
     if (stack->last == stack->size){
         printf("Stack overflowed!\n");
         return -1;
@@ -28,7 +29,7 @@ char pushStaticStack(staticStack* stack, char elm){
     return 0;
 }
 
-char popStaticStack(staticStack* stack){
+int popStaticStack(staticStack* stack){
     if (stack->last == 0){
         printf("Stack empty!\n");
         return ' ';
@@ -40,7 +41,7 @@ char popStaticStack(staticStack* stack){
 
 void printStaticStack(staticStack* stack){
     for(int i = stack->last - 1; i >= 0; --i){
-        printf("%c --> ", stack->array[i]);
+        printf("%d --> ", stack->array[i]);
     }
     printf("NULL\n");
 }
@@ -52,15 +53,42 @@ void freeStaticStack(staticStack* stack){
     }
 }
 
-//  Динамичный стек
-struct dynamicStack {
-    char data;
-    struct dynamicStack *ptr_next;
-};
+void testEfficiencyStaticStack(staticStack* stack, int size){
+    clock_t start = clock();
+    for (int i = 0; i < size; i++) {
+        pushStaticStack(stack, 10);
+    }
+    for (int i = 0; i < size+1; i++) {
+        popStaticStack(stack);
+    }
+    clock_t end = clock();
+    double time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Время выполнения: %f сек\n", time_used);
+}
 
-void pushDynamicStack(struct dynamicStack **head, const char symb)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  Динамичный стек
+typedef struct dynamicStack {
+    int data;
+    struct dynamicStack *ptr_next;
+} dynamicStack;
+
+void pushDynamicStack(dynamicStack **head, int symb)
 {
-    struct dynamicStack *new_ptr = (struct dynamicStack*)malloc(sizeof(struct dynamicStack));
+    dynamicStack *new_ptr = (struct dynamicStack*)malloc(sizeof(struct dynamicStack));
     if (new_ptr == NULL) {
         printf("Memory allocation error!\n");
         return;
@@ -71,15 +99,15 @@ void pushDynamicStack(struct dynamicStack **head, const char symb)
     *head = new_ptr;
 }
 
-char popDynamicStack(struct dynamicStack **head)
+int popDynamicStack(dynamicStack **head)
 {
     if (*head == NULL) {
         printf("dynamicStack is empty\n");
         return 1;
     }
 
-    struct dynamicStack *temp = *head;
-    char value  = temp->data;
+    dynamicStack *temp = *head;
+    int value  = temp->data;
     *head = temp->ptr_next;
     free(temp);
 
@@ -90,7 +118,7 @@ void printDynamicStack(struct dynamicStack *head)
 {
     struct dynamicStack *curr = head;
     while (curr != NULL) {
-        printf("%c --> ", curr->data);
+        printf("%d --> ", curr->data);
         curr = curr->ptr_next;
     }
     printf("NULL\n");
@@ -105,13 +133,42 @@ void freeDynamicStack(struct dynamicStack **head)
     }
 }
 
+void testEfficiencyDynamicStack(struct dynamicStack **head) {
+    clock_t start = clock();
+    for (int i = 0; i < 10000000; i++) {
+        pushDynamicStack(head, 10);
+    }
+    for (int i = 0; i < 10000001; i++) {
+        popDynamicStack(head);
+    }
+    clock_t end = clock();
+    double time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Время выполнения: %f сек\n", time_used);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 // deque.c
 
 typedef struct staticDeque {
-    char* array;
+    int* array;
     int size;
     int head;
     int tail;
@@ -120,13 +177,13 @@ typedef struct staticDeque {
 staticDeque* createStaticDeque(int size){
     staticDeque* deque = (staticDeque*)malloc(sizeof(staticDeque));
     deque->size = size + 1;
-    deque->array = (char*)malloc(size * sizeof(char));
+    deque->array = (int*)malloc(deque->size * sizeof(int));
     deque->head = 0;
     deque->tail = 0;
     return deque;
 }
 
-char pushHeadStaticDeque(staticDeque* deque, char elm){
+int pushHeadStaticDeque(staticDeque* deque, int elm){
     if ((deque->head - deque->tail + deque->size + 1) % deque->size == 0){
         printf("deque overflowed!\n");
         return -1;
@@ -136,7 +193,7 @@ char pushHeadStaticDeque(staticDeque* deque, char elm){
     return 0;
 }
 
-char pushTailStaticDeque(staticDeque* deque, char elm){
+int pushTailStaticDeque(staticDeque* deque, int elm){
     if ((deque->head - deque->tail + deque->size + 1) % deque->size == 0){
         printf("deque overflowed!\n");
         return -1;
@@ -146,33 +203,36 @@ char pushTailStaticDeque(staticDeque* deque, char elm){
     return 0;
 }
 
-char popHeadStaticDeque(staticDeque* deque){
+int popHeadStaticDeque(staticDeque* deque){
     if (deque->head == deque->tail){
         printf("deque empty!\n");
         return ' ';
     }
 
-    char smbl = deque->array[deque->head];
-    deque->head = (deque->tail - 1 + deque->size) % deque->size;
+    int smbl = deque->array[deque->head];
+    deque->head = (deque->head - 1 + deque->size) % deque->size;
     return smbl;
 }
 
-char popTailStaticDeque(staticDeque* deque){
+int popTailStaticDeque(staticDeque* deque){
     if (deque->head == deque->tail){
         printf("deque empty!\n");
         return ' ';
     }
 
-    deque->head = (deque->tail + 1) % deque->size;
-    char smbl = deque->array[deque->tail];
+    deque->tail = (deque->tail + 1) % deque->size;
+    int smbl = deque->array[deque->tail];
     return smbl;
 }
 
 void printStaticDeque(staticDeque* deque){
-    if ((deque->head - deque->tail + deque->size + 1) % deque->size != 1){
+    if (deque->head != deque->tail){
         printf("NULL --> ");
-        for(int i = deque->head; i != deque->tail; i = (i - 1 + deque->size) % deque->size){
-            printf("%c --> ", deque->array[i]);
+        int i = deque->head;
+        while (i != deque->tail) {
+            printf("%d -> ", deque->array[i]);
+            
+            i = (i - 1 + deque->size) % deque->size;
         }
     }
     printf("NULL\n");
@@ -185,10 +245,42 @@ void freeStaticDeque(staticDeque* deque){
     }
 }
 
+void testEfficiencyStaticDeque(staticDeque* deque, int size){
+    clock_t start = clock();
+    for (int i = 0; i < size; i++) {
+        pushTailStaticDeque(deque, 10);
+    }
+    for (int i = 0; i < size+1; i++) {
+        popTailStaticDeque(deque);
+    }
+    clock_t end = clock();
+    double time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Время выполнения: %f сек\n", time_used);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //  Динамичный Дек
 
 typedef struct dynamicDeque {
-    char data;
+    int data;
     struct dynamicDeque *prev;
     struct dynamicDeque *next;
 } dynamicDeque;
@@ -198,7 +290,7 @@ typedef struct coord {
     struct dynamicDeque *tail;
 } coord;
 
-void pushFrontDynamicDeque(struct coord *dq, const char value)
+void pushFrontDynamicDeque(struct coord *dq, const int value)
 {
     struct dynamicDeque *new_ptr = (struct dynamicDeque*)malloc(sizeof(struct dynamicDeque));
     if (new_ptr == NULL) {
@@ -219,7 +311,7 @@ void pushFrontDynamicDeque(struct coord *dq, const char value)
     dq->head = new_ptr;
 }
 
-void pushBackDynamicDeque(struct coord *dq, const char value)
+void pushBackDynamicDeque(struct coord *dq, const int value)
 {
     struct dynamicDeque *new_ptr = (struct dynamicDeque*)malloc(sizeof(struct dynamicDeque));
     if (new_ptr == NULL) {
@@ -241,7 +333,7 @@ void pushBackDynamicDeque(struct coord *dq, const char value)
 
 }
 
-char popFrontDynamicDeque(struct coord  *dq)
+int popFrontDynamicDeque(struct coord  *dq)
 {
     if (dq->head == NULL) {
         printf("deque is empty\n");
@@ -249,7 +341,7 @@ char popFrontDynamicDeque(struct coord  *dq)
     }
 
     struct dynamicDeque *temp = dq->head;
-    char value = temp->data;
+    int value = temp->data;
     dq->head = dq->head->next;
     if (dq->head == NULL) {
         dq->tail = NULL;
@@ -262,7 +354,7 @@ char popFrontDynamicDeque(struct coord  *dq)
     return value;
 }
 
-char popBackDynamicDeque(struct coord *dq)
+int popBackDynamicDeque(struct coord *dq)
 {
     if (dq->head == NULL) {
         printf("deque is empty\n");
@@ -270,7 +362,7 @@ char popBackDynamicDeque(struct coord *dq)
     }
 
     struct dynamicDeque *temp = dq->tail;
-    char value = temp->data;
+    int value = temp->data;
     dq->tail = dq->tail->prev;
     if (dq->tail == NULL) {
         dq->head = NULL;
@@ -289,7 +381,7 @@ void printDynamicDeque(struct coord *dq)
     if (dq->head != NULL){
         printf("NULL --> ");
         while (curr != NULL) {
-            printf("%c --> ", curr->data);
+            printf("%d --> ", curr->data);
             curr = curr->next;
     }
     }
@@ -306,6 +398,36 @@ void freeDynamicDeque(struct coord *dq)
     dq->tail = NULL;
 }
 
+void testEfficiencyDynamicDeque(struct coord *dq)
+{
+    clock_t start = clock();
+    for (int i = 0; i < 10000000; i++) {
+        pushBackDynamicDeque(dq, 10);
+    }
+    for (int i = 0; i < 10000001; i++) {
+        popBackDynamicDeque(dq);
+    }
+    clock_t end = clock();
+    double time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Время выполнения: %f сек\n", time_used);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // main.c
 
@@ -313,17 +435,13 @@ void freeDynamicDeque(struct coord *dq)
 #include <stdlib.h>
 #include <string.h>
 
-#include "stack.h"
-#include "deque.h"
-
 enum Program{
     PROG_EXIT = 0,
     STATIC_STACK_TEST = 1,
     DYNAMIC_STACK_TEST = 2,
     STATIC_DEQUE_TEST = 3,
     DYNAMIC_DEQUE_TEST = 4,
-    CART_COLLECTOR = 5,
-    PROG_NEED_CHOICE = 6
+    PROG_NEED_CHOICE = 5
 };
 
 enum StackOperation{
@@ -331,7 +449,8 @@ enum StackOperation{
     STACK_PUSH = 1,
     STACK_POP = 2,
     STACK_PRINT = 3,
-    STACK_NEED_CHOICE = 4
+    STACK_TEST = 4,
+    STACK_NEED_CHOICE = 5
 };
 
 enum DequeOperation{
@@ -341,8 +460,17 @@ enum DequeOperation{
     DEQUE_POP_FRONT = 3,
     DEQUE_POP_BACK = 4,
     DEQUE_PRINT = 5,
-    DEQUE_NEED_CHOICE = 6
+    DEQUE_TEST = 6,
+    DEQUE_NEED_CHOICE = 7
 };
+
+
+
+
+
+
+
+
 
 void testStaticStack(){
     int size;
@@ -358,12 +486,13 @@ void testStaticStack(){
         printf("\t|  1. Push               |\n");
         printf("\t|  2. Pop                |\n");
         printf("\t|  3. Print              |\n");
+        printf("\t|  4. Test               |\n");
         printf("\t|  0. Exit               |\n");
         printf("\t--------------------------\n");
         printf("Select: ");
         scanf("%d", &choice);
 
-        if (choice < 0 || choice > 3) choice = 4;
+        if (choice < 0 || choice > 4) choice = 5;
         op = choice;
         
         switch(op){
@@ -373,22 +502,32 @@ void testStaticStack(){
             case (STACK_NEED_CHOICE):
                 break;
             case (STACK_PUSH):
-                char smbl;
+                int smbl;
                 printf("Push: ");
-                scanf(" %c", &smbl);
+                scanf(" %d", &smbl);
                 pushStaticStack(stack, smbl);
                 break;
             case (STACK_POP):
-                char elm = popStaticStack(stack);
-                printf("Pop: %c\n", elm);
+                int elm = popStaticStack(stack);
+                printf("Pop: %d\n", elm);
                 break;
             case (STACK_PRINT):
                 printStaticStack(stack);
+                break;
+            case (STACK_TEST):
+                testEfficiencyStaticStack(stack, size);
                 break;
         }
         op = STACK_NEED_CHOICE;
     }
 }
+
+
+
+
+
+
+
 
 void testDynamicStack(){
     dynamicStack *head = NULL;
@@ -401,12 +540,13 @@ void testDynamicStack(){
         printf("\t|  1. Push               |\n");
         printf("\t|  2. Pop                |\n");
         printf("\t|  3. Print              |\n");
+        printf("\t|  4. Test               |\n");
         printf("\t|  0. Exit               |\n");
         printf("\t--------------------------\n");
         printf("Select: ");
         scanf("%d", &choice);
 
-        if (choice < 0 || choice > 3) choice = 4;
+        if (choice < 0 || choice > 4) choice = 5;
         op = choice;
         
         switch(op){
@@ -416,22 +556,32 @@ void testDynamicStack(){
             case (STACK_NEED_CHOICE):
                 break;
             case (STACK_PUSH):
-                char smbl;
+                int smbl;
                 printf("Push: ");
-                scanf(" %c", &smbl);
+                scanf(" %d", &smbl);
                 pushDynamicStack(&head, smbl);
                 break;
             case (STACK_POP):
-                char elm = popDynamicStack(&head);
-                printf("Pop: %c\n", elm);
+                int elm = popDynamicStack(&head);
+                printf("Pop: %d\n", elm);
                 break;
             case (STACK_PRINT):
                 printDynamicStack(head);
+                break;
+            case (STACK_TEST):
+                testEfficiencyDynamicStack(&head);
                 break;
         }
         op = STACK_NEED_CHOICE;
     }
 }
+
+
+
+
+
+
+
 
 void testStaticDeque(){
     int size;
@@ -449,12 +599,13 @@ void testStaticDeque(){
         printf("\t|  3. Pop Front          |\n");
         printf("\t|  4. Pop Back           |\n");
         printf("\t|  5. Print              |\n");
+        printf("\t|  6. Test               |\n");
         printf("\t|  0. Exit               |\n");
         printf("\t--------------------------\n");
         printf("Select: ");
         scanf("%d", &choice);
 
-        if (choice < 0 || choice > 5) choice = 6;
+        if (choice < 0 || choice > 6) choice = 7;
         op = choice;
         
         switch(op){
@@ -464,32 +615,42 @@ void testStaticDeque(){
             case (DEQUE_NEED_CHOICE):
                 break;
             case (DEQUE_PUSH_FRONT):
-                char smblf;
+                int smblf;
                 printf("Push: ");
-                scanf(" %c", &smblf);
+                scanf(" %d", &smblf);
                 pushHeadStaticDeque(deque, smblf);
                 break;
             case (DEQUE_PUSH_BACK):
-                char smblb;
+                int smblb;
                 printf("Push: ");
-                scanf(" %c", &smblb);
+                scanf(" %d", &smblb);
                 pushTailStaticDeque(deque, smblb);
                 break;
             case (DEQUE_POP_FRONT):
-                char elmf = popHeadStaticDeque(deque);
-                printf("Pop: %c\n", elmf);
+                int elmf = popHeadStaticDeque(deque);
+                printf("Pop: %d\n", elmf);
                 break;
             case (DEQUE_POP_BACK):
-                char elmb = popTailStaticDeque(deque);
-                printf("Pop: %c\n", elmb);
+                int elmb = popTailStaticDeque(deque);
+                printf("Pop: %d\n", elmb);
                 break;
             case (DEQUE_PRINT):
                 printStaticDeque(deque);
+                break;
+            case (DEQUE_TEST):
+                testEfficiencyStaticDeque(deque, size);
                 break;
         }
         op = DEQUE_NEED_CHOICE;
     }
 }
+
+
+
+
+
+
+
 
 void testDynamicDeque(){
     coord dq;
@@ -506,12 +667,13 @@ void testDynamicDeque(){
         printf("\t|  3. Pop Front          |\n");
         printf("\t|  4. Pop Back           |\n");
         printf("\t|  5. Print              |\n");
+        printf("\t|  6. Test               |\n");
         printf("\t|  0. Exit               |\n");
         printf("\t--------------------------\n");
         printf("Select: ");
         scanf("%d", &choice);
 
-        if (choice < 0 || choice > 5) choice = 6;
+        if (choice < 0 || choice > 6) choice = 7;
         op = choice;
         
         switch(op){
@@ -521,32 +683,42 @@ void testDynamicDeque(){
             case (DEQUE_NEED_CHOICE):
                 break;
             case (DEQUE_PUSH_FRONT):
-                char smblf;
+                int smblf;
                 printf("Push: ");
-                scanf(" %c", &smblf);
+                scanf(" %d", &smblf);
                 pushFrontDynamicDeque(&dq, smblf);
                 break;
             case (DEQUE_PUSH_BACK):
-                char smblb;
+                int smblb;
                 printf("Push: ");
-                scanf(" %c", &smblb);
+                scanf(" %d", &smblb);
                 pushBackDynamicDeque(&dq, smblb);
                 break;
             case (DEQUE_POP_FRONT):
-                char elmf = popFrontDynamicDeque(&dq);
-                printf("Pop: %c\n", elmf);
+                int elmf = popFrontDynamicDeque(&dq);
+                printf("Pop: %d\n", elmf);
                 break;
             case (DEQUE_POP_BACK):
-                char elmb = popBackDynamicDeque(&dq);
-                printf("Pop: %c\n", elmb);
+                int elmb = popBackDynamicDeque(&dq);
+                printf("Pop: %d\n", elmb);
                 break;
             case (DEQUE_PRINT):
                 printDynamicDeque(&dq);
+                break;
+            case(DEQUE_TEST):
+                testEfficiencyDynamicDeque(&dq);
                 break;
         }
         op = DEQUE_NEED_CHOICE;
     }
 }
+
+
+
+
+
+
+
 
 int main(void){
     enum Program op = PROG_NEED_CHOICE;
@@ -556,16 +728,15 @@ int main(void){
         printf("\t--------------------------\n");
         printf("\t|  Choose option         |\n");
         printf("\t|  1. Static stack       |\n");
-        printf("\t|  2. Dinamic stack      |\n");
+        printf("\t|  2. Dynamic stack      |\n");
         printf("\t|  3. Static deque       |\n");
-        printf("\t|  4. Dinamic deque      |\n");
-        printf("\t|  5. Cart collector     |\n");
+        printf("\t|  4. Dynamic deque      |\n");
         printf("\t|  0. Exit               |\n");
         printf("\t--------------------------\n");
         printf("Select: ");
         scanf("%d", &choice);
 
-        if (choice < 0 || choice > 5) choice = 6;
+        if (choice < 0 || choice > 4) choice = 5;
         op = choice;
         
         switch(op){
@@ -584,8 +755,6 @@ int main(void){
                 break;
             case (DYNAMIC_DEQUE_TEST):
                 testDynamicDeque();
-                break;
-            case (CART_COLLECTOR):
                 break;
         }
         op = PROG_NEED_CHOICE;

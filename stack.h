@@ -9,26 +9,30 @@ typedef struct staticStack {
 
 staticStack* createStaticStack(int size);
 
-char pushStaticStack(staticStack* stack, char elm);
+int pushStaticStack(staticStack* stack, int elm);
 
-char popStaticStack(staticStack* stack);
+int popStaticStack(staticStack* stack);
 
 void printStaticStack(staticStack* stack);
 
 void freeStaticStack(staticStack* stack);
 
+void testEfficiencyStaticStack(staticStack* stack, int size);
+
 
 typedef struct dynamicStack {
-    char data;
+    int data;
     struct dynamicStack *ptr_next;
 } dynamicStack;
 
-void pushDynamicStack(struct dynamicStack **head, const char symb);
+void pushDynamicStack(dynamicStack **head, int symb);
 
-char popDynamicStack(struct dynamicStack **head);
+int popDynamicStack(dynamicStack **head);
 
 void printDynamicStack(struct dynamicStack *head);
 
 void freeDynamicStack(struct dynamicStack **head);
+
+void testEfficiencyDynamicStack(struct dynamicStack **head);
 
 #endif

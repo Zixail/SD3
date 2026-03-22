@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct staticDeque {
-    char* array;
+    int* array;
     int size;
     int head;
     int tail;
@@ -11,13 +12,13 @@ typedef struct staticDeque {
 staticDeque* createStaticDeque(int size){
     staticDeque* deque = (staticDeque*)malloc(sizeof(staticDeque));
     deque->size = size + 1;
-    deque->array = (char*)malloc(deque->size * sizeof(char));
+    deque->array = (int*)malloc(deque->size * sizeof(int));
     deque->head = 0;
     deque->tail = 0;
     return deque;
 }
 
-char pushHeadStaticDeque(staticDeque* deque, char elm){
+int pushHeadStaticDeque(staticDeque* deque, int elm){
     if ((deque->head - deque->tail + deque->size + 1) % deque->size == 0){
         printf("deque overflowed!\n");
         return -1;
@@ -27,7 +28,7 @@ char pushHeadStaticDeque(staticDeque* deque, char elm){
     return 0;
 }
 
-char pushTailStaticDeque(staticDeque* deque, char elm){
+int pushTailStaticDeque(staticDeque* deque, int elm){
     if ((deque->head - deque->tail + deque->size + 1) % deque->size == 0){
         printf("deque overflowed!\n");
         return -1;
@@ -37,33 +38,36 @@ char pushTailStaticDeque(staticDeque* deque, char elm){
     return 0;
 }
 
-char popHeadStaticDeque(staticDeque* deque){
+int popHeadStaticDeque(staticDeque* deque){
     if (deque->head == deque->tail){
         printf("deque empty!\n");
         return ' ';
     }
 
-    char smbl = deque->array[deque->head];
-    deque->head = (deque->tail - 1 + deque->size) % deque->size;
+    int smbl = deque->array[deque->head];
+    deque->head = (deque->head - 1 + deque->size) % deque->size;
     return smbl;
 }
 
-char popTailStaticDeque(staticDeque* deque){
+int popTailStaticDeque(staticDeque* deque){
     if (deque->head == deque->tail){
         printf("deque empty!\n");
         return ' ';
     }
 
     deque->tail = (deque->tail + 1) % deque->size;
-    char smbl = deque->array[deque->tail];
+    int smbl = deque->array[deque->tail];
     return smbl;
 }
 
 void printStaticDeque(staticDeque* deque){
-    if ((deque->head - deque->tail + deque->size + 1) % deque->size != 1){
+    if (deque->head != deque->tail){
         printf("NULL --> ");
-        for(int i = deque->head; i != deque->tail; i = (i - 1 + deque->size) % deque->size){
-            printf("%c --> ", deque->array[i]);
+        int i = deque->head;
+        while (i != deque->tail) {
+            printf("%d -> ", deque->array[i]);
+            
+            i = (i - 1 + deque->size) % deque->size;
         }
     }
     printf("NULL\n");
@@ -76,10 +80,23 @@ void freeStaticDeque(staticDeque* deque){
     }
 }
 
+void testEfficiencyStaticDeque(staticDeque* deque, int size){
+    clock_t start = clock();
+    for (int i = 0; i < size; i++) {
+        pushTailStaticDeque(deque, 10);
+    }
+    for (int i = 0; i < size+1; i++) {
+        popTailStaticDeque(deque);
+    }
+    clock_t end = clock();
+    double time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Время выполнения: %f сек\n", time_used);
+}
+
 //  Динамичный Дек
 
 typedef struct dynamicDeque {
-    char data;
+    int data;
     struct dynamicDeque *prev;
     struct dynamicDeque *next;
 } dynamicDeque;
@@ -89,7 +106,7 @@ typedef struct coord {
     struct dynamicDeque *tail;
 } coord;
 
-void pushFrontDynamicDeque(struct coord *dq, const char value)
+void pushFrontDynamicDeque(struct coord *dq, const int value)
 {
     struct dynamicDeque *new_ptr = (struct dynamicDeque*)malloc(sizeof(struct dynamicDeque));
     if (new_ptr == NULL) {
@@ -110,7 +127,7 @@ void pushFrontDynamicDeque(struct coord *dq, const char value)
     dq->head = new_ptr;
 }
 
-void pushBackDynamicDeque(struct coord *dq, const char value)
+void pushBackDynamicDeque(struct coord *dq, const int value)
 {
     struct dynamicDeque *new_ptr = (struct dynamicDeque*)malloc(sizeof(struct dynamicDeque));
     if (new_ptr == NULL) {
@@ -132,7 +149,7 @@ void pushBackDynamicDeque(struct coord *dq, const char value)
 
 }
 
-char popFrontDynamicDeque(struct coord  *dq)
+int popFrontDynamicDeque(struct coord  *dq)
 {
     if (dq->head == NULL) {
         printf("deque is empty\n");
@@ -140,7 +157,7 @@ char popFrontDynamicDeque(struct coord  *dq)
     }
 
     struct dynamicDeque *temp = dq->head;
-    char value = temp->data;
+    int value = temp->data;
     dq->head = dq->head->next;
     if (dq->head == NULL) {
         dq->tail = NULL;
@@ -153,7 +170,7 @@ char popFrontDynamicDeque(struct coord  *dq)
     return value;
 }
 
-char popBackDynamicDeque(struct coord *dq)
+int popBackDynamicDeque(struct coord *dq)
 {
     if (dq->head == NULL) {
         printf("deque is empty\n");
@@ -161,7 +178,7 @@ char popBackDynamicDeque(struct coord *dq)
     }
 
     struct dynamicDeque *temp = dq->tail;
-    char value = temp->data;
+    int value = temp->data;
     dq->tail = dq->tail->prev;
     if (dq->tail == NULL) {
         dq->head = NULL;
@@ -180,7 +197,7 @@ void printDynamicDeque(struct coord *dq)
     if (dq->head != NULL){
         printf("NULL --> ");
         while (curr != NULL) {
-            printf("%c --> ", curr->data);
+            printf("%d --> ", curr->data);
             curr = curr->next;
     }
     }
@@ -195,4 +212,18 @@ void freeDynamicDeque(struct coord *dq)
         free(temp);
     }
     dq->tail = NULL;
+}
+
+void testEfficiencyDynamicDeque(struct coord *dq)
+{
+    clock_t start = clock();
+    for (int i = 0; i < 10000000; i++) {
+        pushBackDynamicDeque(dq, 10);
+    }
+    for (int i = 0; i < 10000001; i++) {
+        popBackDynamicDeque(dq);
+    }
+    clock_t end = clock();
+    double time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Время выполнения: %f сек\n", time_used);
 }
