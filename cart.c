@@ -15,7 +15,7 @@ typedef struct Train{
     dynamicStack* cars;
     int countCur;
     int countPlan;
-    int* plan;
+    int* plan; 
 } Train;
 
 typedef struct Station{
@@ -216,6 +216,7 @@ int main(int argc, char* argv[]){
 
     }
 
+    printDynamicStack(station->train.cars);
     int TOTAL = LINE_ADD + LINE_REMOVE + TRAIN_ADD + TRAIN_REMOVE;
     printf("LINE_ADD: %d\n", LINE_ADD);
     printf("LINE_REMOVE: %d\n", LINE_REMOVE);
