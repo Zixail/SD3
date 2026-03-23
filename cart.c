@@ -54,6 +54,8 @@ Station* initStation(const char* path){
         fscanf(fp, "%d", &station->train.plan[i]);
     }
 
+    fclose(fp);
+
     return station;
 }
 
@@ -220,6 +222,10 @@ int main(int argc, char* argv[]){
     printf("TRAIN_ADD: %d\n", TRAIN_ADD);
     printf("TRAIN_REMOVE: %d\n", TRAIN_REMOVE);
     printf("TOTAL: %d\n", TOTAL);
+
+    free(station->train.plan);
+    free(station->rails);
+    free(station);
 
 
 

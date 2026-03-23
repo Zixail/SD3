@@ -82,6 +82,8 @@ void testStaticStack(){
         }
         op = STACK_NEED_CHOICE;
     }
+
+    freeStaticStack(stack);
 }
 
 void testDynamicStack(){
@@ -128,7 +130,10 @@ void testDynamicStack(){
                 break;
         }
         op = STACK_NEED_CHOICE;
+
     }
+
+    freeDynamicStack(&head);
 }
 
 void testStaticDeque(){
@@ -191,6 +196,8 @@ void testStaticDeque(){
         }
         op = DEQUE_NEED_CHOICE;
     }
+
+    freeStaticDeque(deque);
 }
 
 void testDynamicDeque(){
@@ -252,6 +259,8 @@ void testDynamicDeque(){
         }
         op = DEQUE_NEED_CHOICE;
     }
+
+    freeDynamicDeque(&dq);
 }
 
 int main(void){
